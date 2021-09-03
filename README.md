@@ -25,6 +25,9 @@ There two special files:
 2. `_.tex` file is the same thing but the sections are simply
    added as `\include{section.tex}`.
 
+Deleting a section is to simply delete the corresponding file. To add a section,
+you have to add it in the `_.tex`.
+
 See also:
 1. https://dwheeler.com/essays/filenames-in-shell.html
 2. https://dwheeler.com/essays/fixing-unix-linux-filenames.html
