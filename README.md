@@ -1,5 +1,10 @@
 # latexmount
 
+This is a virtual file system (FUSE) for LaTex that shows a one-section per file view of the given file under the mount point. You can edit the section file and the edits will be written back (to a temporary file or directly on to your original file if you set `TMP` to empty.).
+
+The parsing is line oriented. That is, it looks for lines with `\section{...}` pattern to identify sections, and tries to find `\label{...}` patterns just after
+to use for naming.
+
 The usage is as follows:
 
 ```
