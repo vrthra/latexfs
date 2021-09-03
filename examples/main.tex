@@ -1,0 +1,285 @@
+\documentclass[sigconf,dvipsnames]{acmart}
+\settopmatter{printacmref=false}
+% defining the \BibTeX command - from Oren Patashnik's original BibTeX documentation.
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08emT\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\newcommand{\mytitle}{How to Compare Fuzzers}
+\usepackage{syntax}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,citecolor=blue,linkcolor=blue,filecolor=blue,urlcolor=blue,pdftitle={\mytitle}}
+
+\usepackage{nicefrac}
+\usepackage{siunitx}
+\usepackage{array,framed}
+\usepackage{booktabs}
+\usepackage{
+  color,
+  float,
+  epsfig,
+  wrapfig,
+  graphics,
+  graphicx,
+  subcaption
+}
+% \usepackage[dvipsnames]{xcolor}
+%\usepackage{textcomp,amssymb}
+\usepackage{setspace}
+% \usepackage{amsfonts}
+\usepackage{latexsym,fancyhdr,url}
+\usepackage{enumerate}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{graphics}
+\usepackage{xparse} % argument parsing -- \edist
+\usepackage{xspace}
+\usepackage{multirow}
+\usepackage{csvsimple}
+\usepackage{balance}
+% \usepackage{flushend}
+% \usepackage{mathptmx,avant}
+
+%%%% Tikz variables, pgfplot
+\usepackage{
+  tikz,
+  pgfplots,
+  pgfplotstable
+}
+\usepackage{hyperref}
+
+\usetikzlibrary{
+  shapes.geometric,
+  arrows,
+  external,
+  pgfplots.groupplots,
+  matrix
+}
+
+\pgfplotsset{compat=1.9}
+% \tikzexternalize[prefix=images/]
+% \tikzexternalenable
+
+%\pagenumbering{arabic}
+% \pagestyle{plain}
+
+\usepackage{mathtools,}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+% \setmathfont{Latin Modern Math}[version=lm]
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+% \DeclareSymbolFont{operators}{T1}{cmr}{m}{n}
+% \DeclareSymbolFont{letters}{OML}{cmm}{m}{it}
+% \DeclareSymbolFont{symbols}{OMS}{cmsy}{m}{n}
+% \DeclareSymbolFont{largesymbols}{OMX}{cmex}{m}{n}
+
+% \usepackage{times}
+
+% \setmathcal{Arial}
+
+% TO deal with the weird flow of boxes
+% \brokenpenalty=1000
+% \clubpenalty=1000
+% \widowpenalty=10
+\DeclareGraphicsExtensions{%
+    .png,.PNG,%
+    .pdf,.PDF,%
+    .jpg,.mps,.jpeg,.jbig2,.jb2,.JPG,.JPEG,.JBIG2,.JB2}
+
+\setlength{\belowcaptionskip}{-10pt} 
+\setlength{\footskip}{30pt}
+\setlength{\abovecaptionskip}{5pt plus 3pt minus 2pt} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% My Commands
+\newcommand{\blackbox}{black-box\xspace}
+\newcommand{\Blackbox}{Black-box\xspace}
+\newcommand{\whitebox}{white-box\xspace}
+\newcommand{\Whitebox}{White-box\xspace}
+\newcommand{\greybox}{grey-box\xspace}
+\newcommand{\Antlr}{ANTLR\xspace}
+\newcommand{\rg}{regular grammar\xspace}
+\newcommand{\RG}{Regular Grammar\xspace}
+\newcommand{\cfg}{context-free grammar\xspace}
+\newcommand{\CFG}{Context-Free Grammar\xspace}
+\newcommand{\Cfg}{Context-free grammar\xspace}
+\newcommand{\nonterminal}{nonterminal\xspace}
+\newcommand{\Nonterminal}{Nonterminal\xspace}
+\newcommand{\Nonterminals}{Nonterminals\xspace}
+\newcommand{\nonterminals}{nonterminals\xspace}
+\newcommand{\terminal}{terminal\xspace}
+\newcommand{\terminals}{terminals\xspace}
+\newcommand{\prule}{rule\xspace}
+\newcommand{\fuzzingbook}{\emph{Fuzzing Book}\xspace}
+\newcommand{\prules}{rules\xspace}
+
+
+\newcommand{\glade}{\emph{GLADE}\xspace}
+\newcommand{\GLADE}{\emph{GLADE}\xspace}
+\newcommand{\pyglade}{\emph{PyGLADE}\xspace}
+\newcommand{\PyGlade}{\emph{PyGLADE}\xspace}
+
+%% Identifiers
+\def\|#1|{\textit{#1}}
+\def\<#1>{\texttt{#1}}
+% \def\[[#1]]{\texttt{#1}} % This breaks all kinds of syntax highlighters
+\def\[[#1\]]{\texttt{#1}} % better?
+
+%% Grammars
+
+\def\term#1{\texttt{'\textbf{#1}'}}
+\newcommand{\termC}[2]{\texttt{'\textbf{\color{#2}#1}'}}
+% \def\term#1{\textbf{#1}}
+\def\nonterm#1{\textnormal{\emph{#1}}}
+\def\regex#1{\texttt{{\color{blue}/}#1{\color{blue}/}}}
+\def\expandsto{\(\rightarrow{}\)}
+
+
+\definecolor{nontermcolor}{rgb}{0.4, 0.05, 0.0} % dark orange
+\definecolor{absnontermcolor}{rgb}{0.4, 0.5, 0.0} % light green
+\definecolor{evokcolor}{rgb}{0.8, 0.05, 0.1}    % orange
+\definecolor{incorrectcolor}{rgb}{0.5, 0.0, 0.13}
+\definecolor{incompletecolor}{rgb}{0.0, 0.0, 0.55}
+%\definecolor{incompletecolor}{rgb}{0.12, 0.3, 0.17}
+\definecolor{validcolor}{rgb}{0.33, 0.42, 0.18} %  {0.0, 0.28, 0.67}
+%\definecolor{retcolor}{rgb}{0.43, 0.21, 0.1}
+\definecolor{retcolor}{rgb}{0.65, 0.16, 0.16}
+\definecolor{ipatterncolor}{rgb}{0.0, 0.5, 0.4} % cyan?
+\definecolor{termcolor}{rgb}{0.0, 0.05, 0.4}    % dark blue
+\definecolor{regexcolor}{rgb}{0.1, 0.3, 0.1}    % dark green
+
+\def\term#1{\texttt{\color{termcolor}'\textbf{#1}'}}
+\def\nonterm#1{{\color{nontermcolor}$\langle$\textnormal{\emph{#1}}$\rangle$}}
+\def\absnonterm#1{{\color{absnontermcolor}$\langle$\textnormal{\emph{#1}}$\rangle$}}
+\def\evoknt#1{{\color{evokcolor}$\langle$\textnormal{\emph{#1}}$\rangle$}}
+\def\ipattern#1{\color{ipatterncolor}#1}
+\def\regex#1{\texttt{\color{regexcolor}/#1/}}
+\def\expandsto{::=}
+
+
+% Grammar Literals
+\renewcommand{\ulitleft}{\normalfont\ttfamily}
+\renewcommand{\litleft}{\bgroup\color{termcolor}`\ulitleft}
+\renewcommand{\litright}{\ulitright'\egroup}
+
+% Grammar Nonterminals
+\renewcommand{\syntleft}{\bgroup\color{nontermcolor}$\langle$\normalfont\itshape}
+\renewcommand{\syntright}{$\rangle$\egroup}
+
+% Grammar Spacing
+\grammarparsep 3pt plus 1pt minus 1pt
+
+% Our grammars: indented, smaller
+\newenvironment{densegrammar}{%
+\begin{small}
+% \setlength{\parsep}{1pt}
+% \setlength{\itemsep}{1pt}
+\begin{grammar}%
+}%
+{%
+\end{grammar}%
+\end{small}%
+}
+\newenvironment{Grammar}%
+{\begin{itemize}\item[]\begin{densegrammar}}%
+{\end{densegrammar}\end{itemize}}%
+
+%%
+
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\marginpar{$|$}\textcolor{red}{\stepcounter{todocounter}\footnote[\thetodocounter]{\textcolor{red}{\textbf{TODO }}\textit{#1}}}}
+\newcommand{\repl}[2]{\textcolor{red}{\textbf{REPLACE }\st{#1} \textit{#2}}}
+\newcommand{\rem}[1]{\textcolor{red}{\textbf{REMOVED }\st{#1}}}
+\newcommand{\done}[1]{\marginpar{$*$}\textcolor{green}{\stepcounter{todocounter}\footnote[\thetodocounter]{\textcolor{black}{\textbf{DONE }}\textit{#1}}}}
+
+% Switch to this line if footnotes instead of endnotes are desired for DONE comments.
+%\newcommand{\done}[1]{\textcolor{green}{\stepcounter{todocounter}\footnote[\thetodocounter]{\textbf{DONE }\textit{#1}}}}
+%\newcommand{\done}[1]{\textcolor{green}{\stepcounter{todocounter}\endnote[\thetodocounter]{\textbf{DONE }\textit{#1}}}}
+
+\IfFileExists{SUBMIT}{
+\renewcommand{\todo}[1]{}
+\renewcommand{\done}[1]{}
+\renewcommand{\rem}[1]{}
+\renewcommand{\theendnotes}{}
+}{
+}
+
+\usepackage{outlines}
+
+\newcommand{\n}[1]{\noindent#1\par\vspace{3px}}
+  
+\newcounter{cenumi}
+  \newcounter{cenumisaved}
+  \setcounter{cenumisaved}{0}
+  \newcommand{\labelcenumi}{}
+  \newenvironment{cenumerate}%
+    {\begin{list}{\labelcenumi}{\usecounter{cenumi}\partopsep=0pt\topsep=0pt\itemsep=0em\parsep=4pt\leftmargin=1em}%
+    \setcounter{cenumi}{\value{cenumisaved}}}%
+      {\setcounter{cenumisaved}{\value{cenumi}}%
+    \end{list}}
+
+\newenvironment{notes}
+  {\noindent\color{RoyalPurple}\fontsize{8}{9}\selectfont\begin{outline}}
+  {\end{outline}}
+
+
+\begin{document}
+%\fontfamily{lmr}\selectfont
+% \def\thetitle{A Practical Way to Generate Strong Keys from Noisy Data}
+\fancyhead{}
+\title{\mytitle}
+
+\author{Rahul Gopinath}
+\affiliation{\small{CISPA}}
+
+
+\date{}
+
+
+\begin{abstract}
+Motivation: 
+
+Problem statement: 
+
+Approach: 
+
+Results: 
+
+Conclusions: 
+\end{abstract}
+
+%% Abstract
+\maketitle
+
+% Section I
+%% Introduction
+\section{Introduction}
+\label{sec:intro}
+My great intro.
+\section{Background}
+\label{sec:background}
+The background
+\section{Approach}
+\label{sec:approach}
+
+My approach
+
+\section{Implementation}
+\label{sec:implementation}
+How did I do it
+\section{Evaluation}
+\label{sec:evaluation}
+The evaluation
+
+\section{Discussion}
+\label{sec:discussion}
+Discussion
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bib}
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

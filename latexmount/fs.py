@@ -335,6 +335,6 @@ class LatexFS(Operations):
 
         return 0
 
-def init_fs(latex_file, mountpoint):
-    FUSE(LatexFS(latex_file), 'mount', nothreads=True, foreground=True)
+def init_fs(latex_file, mount):
+    FUSE(LatexFS(latex_file), mount, nothreads=True, foreground=True)
 
