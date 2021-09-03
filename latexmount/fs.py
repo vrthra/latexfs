@@ -332,6 +332,17 @@ class LatexFS(Operations):
 
         del self.fs[the_dir][the_file]
         del self.meta[full_path]
+        main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
+        my_lines = []
+        for line in main_tex.split('\n'):
+            if line[len('\\include{'):-1] == the_file[:-4]:
+                print("removing: ", the_file)
+                continue
+            else:
+                print(repr(line))
+                my_lines.append(line)
+        self.fs["/"][MAIN_TEX_FILE] = bytes("\n".join(my_lines), 'utf-8')
+        self.recreate_main(path)
 
         return 0
 
