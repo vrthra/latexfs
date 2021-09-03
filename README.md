@@ -28,3 +28,6 @@ There two special files:
 Deleting a section is to simply delete the corresponding file. To add a section,
 you have to add it in the `_.tex`.
 
+After each modification, the original latex file is regenerated and written to
+`<original>._` file. You can set the `TMP` value to empty string if you would
+rather have this file overwrite your original file.

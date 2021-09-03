@@ -16,6 +16,7 @@ SECTION_BEGIN = '\\section{'
 SECTIONS_END = '\\bibliographystyle{'
 MAIN_TEX_FILE='_.tex'
 ORIGINAL_TEX_FILE='.tex'
+TMP = '._'
 
 class SplitLatex:
     def split_sections(self, data):
@@ -214,6 +215,8 @@ class LatexFS(Operations):
                 'st_gid': os.getuid(),
                 'st_uid': os.getgid(),
                 }
+        with open(self.latex_file + TMP, 'wb+') as f:
+            f.write(self.fs["/"][ORIGINAL_TEX_FILE])
 
 
     def interpret_main_tex(self):
