@@ -24,9 +24,9 @@ class SplitLatex:
         sections = [[]]
         while lines:
             line, *lines = lines
-            if line.startswith(SECTION_BEGIN):
+            if line.strip().startswith(SECTION_BEGIN):
                 sections.append([line])
-            elif line.startswith(SECTIONS_END):
+            elif line.strip().startswith(SECTIONS_END):
                 sections.append([line])
             else:
                 sections[-1].append(line)
@@ -36,12 +36,12 @@ class SplitLatex:
     def process_section(self, lines):
         if lines[0].startswith(SECTION_BEGIN):
             assert len(lines) >= 2
-            sec_name = lines[0]
-            sec_label = lines[1]
+            sec_name = lines[0].strip()
+            sec_label = lines[1].strip()
             # todo: if label does not exist, make up one from sec_name
             assert sec_label.startswith('\label{') and sec_label[-1] == '}'
             return (sec_name, sec_label[7:-1], '\n'.join(lines))
-        elif lines[0].startswith(SECTIONS_END):
+        elif lines[0].strip().startswith(SECTIONS_END):
             return ('_end', '_end', '\n'.join(lines))
         else:
             return ('_start', '_start', '\n'.join(lines))
@@ -199,7 +199,7 @@ class LatexFS(Operations):
         main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
         lines = []
         for line in main_tex.split('\n'):
-            if line.startswith('\include{') and line.endswith('}'):
+            if line.strip().startswith('\include{') and line.endswith('}'):
                 inc_file = line[len('\include{'):-1] + '.tex'
                 lines.append(self.fs['/'][inc_file].decode('utf-8'))
             else:
@@ -223,7 +223,7 @@ class LatexFS(Operations):
         main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
         includes = []
         for line in main_tex.split('\n'):
-            if line.startswith('\include{') and line.endswith('}'):
+            if line.strip().startswith('\include{') and line.endswith('}'):
                 inc_file = line[len('\include{'):-1] + '.tex'
                 includes.append(inc_file)
 
@@ -338,7 +338,7 @@ class LatexFS(Operations):
         main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
         my_lines = []
         for line in main_tex.split('\n'):
-            if line[len('\\include{'):-1] == the_file[:-4]:
+            if line.strip()[len('\\include{'):-1] == the_file[:-4]:
                 print("removing: ", the_file)
                 continue
             else:
