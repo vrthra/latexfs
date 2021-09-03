@@ -28,8 +28,3 @@ There two special files:
 Deleting a section is to simply delete the corresponding file. To add a section,
 you have to add it in the `_.tex`.
 
-See also:
-1. https://dwheeler.com/essays/filenames-in-shell.html
-2. https://dwheeler.com/essays/fixing-unix-linux-filenames.html
-3. https://lwn.net/Articles/325304/
-4. https://lwn.net/Articles/686789/
