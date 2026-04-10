@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-# adapted from here: https://github.com/gehaxelt/Python-InMemoryFS/
 import os
 import sys
 import errno
 import string
-import pudb
-bp = pudb.set_trace
+# import pudb
+# bp = pudb.set_trace
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -32,16 +30,31 @@ class SplitLatex:
                 sections[-1].append(line)
         return sections
 
-
     def process_section(self, lines):
-        if lines[0].startswith(SECTION_BEGIN):
-            assert len(lines) >= 2
-            sec_name = lines[0].strip()
-            sec_label = lines[1].strip()
-            # todo: if label does not exist, make up one from sec_name
-            assert sec_label.startswith('\label{') and sec_label[-1] == '}'
-            return (sec_name, sec_label[7:-1], '\n'.join(lines))
-        elif lines[0].strip().startswith(SECTIONS_END):
+        # Handle the preamble or the end of the file
+        first_line = lines[0].strip()
+
+        if first_line.startswith(SECTION_BEGIN):
+            sec_name = first_line
+            sec_label = None
+
+            # Look through the lines in this section for a \label
+            for i in range(1, len(lines)):
+                candidate = lines[i].strip()
+                if candidate.startswith(r'\label{') and candidate.endswith('}'):
+                    sec_label = candidate[7:-1]
+                    break
+
+            # If no label found, slugify the section name as a fallback
+            if not sec_label:
+                # Extracts "My Section" from "\section{My Section}"
+                clean_name = sec_name[len(SECTION_BEGIN):-1]
+                sec_label = "".join(c for c in clean_name if c.isalnum() or c==' ').strip().replace(' ', '_')
+                if not sec_label: sec_label = "section_%d" % time.time()
+
+            return (sec_name, sec_label, '\n'.join(lines))
+
+        elif first_line.startswith(SECTIONS_END):
             return ('_end', '_end', '\n'.join(lines))
         else:
             return ('_start', '_start', '\n'.join(lines))
@@ -67,7 +80,7 @@ class LatexFS(Operations):
             if sname == '_start' or sname == '_end':
                 main.append(content)
             else:
-                main.append('\include{%s}' % label)
+                main.append('\\include{%s}' % label)
                 self.fs["/"][label + '.tex'] = bytes(content, 'utf-8')
 
         self.fs["/"][MAIN_TEX_FILE] = bytes('\n'.join(main), 'utf-8')
@@ -199,8 +212,8 @@ class LatexFS(Operations):
         main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
         lines = []
         for line in main_tex.split('\n'):
-            if line.strip().startswith('\include{') and line.endswith('}'):
-                inc_file = line[len('\include{'):-1] + '.tex'
+            if line.strip().startswith('\\include{') and line.endswith('}'):
+                inc_file = line[len('\\include{'):-1] + '.tex'
                 lines.append(self.fs['/'][inc_file].decode('utf-8'))
             else:
                 lines.append(line)
@@ -223,8 +236,8 @@ class LatexFS(Operations):
         main_tex = self.fs["/"][MAIN_TEX_FILE].decode('utf-8')
         includes = []
         for line in main_tex.split('\n'):
-            if line.strip().startswith('\include{') and line.endswith('}'):
-                inc_file = line[len('\include{'):-1] + '.tex'
+            if line.strip().startswith('\\include{') and line.endswith('}'):
+                inc_file = line[len('\\include{'):-1] + '.tex'
                 includes.append(inc_file)
 
         # for k in list(self.fs['/']):
@@ -236,7 +249,7 @@ class LatexFS(Operations):
         for k in includes:
             if k not in self.fs['/']:
                 print('Creating %s'% k )
-                my_buf = "\section{%s}\n\label{%s}\n" % (k, k)
+                my_buf = "\\section{%s}\n\\label{%s}\n" % (k, k)
                 self.fs['/'][k] = bytes(my_buf, 'utf-8')
                 self.meta['/' + k] = {
                         'st_atime': time.time(),
